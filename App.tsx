@@ -121,18 +121,21 @@ const App: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setTasks(currentTasks =>
-        currentTasks.map(task =>
-          task.isTimerRunning
-            ? { ...task, durationSeconds: task.durationSeconds + 1 }
-            : task
-        )
+        currentTasks.map(task => {
+          if (task.isTimerRunning) {
+            // If we have a start time, calculate elapsed
+            // For now, simple increment, but ideally we sync with server start time
+            return { ...task, durationSeconds: task.durationSeconds + 1 };
+          }
+          return task;
+        })
       );
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Sync running timers to DB every 30 seconds
+  // Sync running timers to DB every 10 seconds (more frequent)
   useEffect(() => {
     const interval = setInterval(() => {
       tasks.forEach(t => {
@@ -140,7 +143,7 @@ const App: React.FC = () => {
           taskService.updateTask(t.id, { durationSeconds: t.durationSeconds });
         }
       });
-    }, 30000);
+    }, 10000);
     return () => clearInterval(interval);
   }, [tasks]);
 
@@ -181,8 +184,9 @@ const App: React.FC = () => {
     if (!task) return;
 
     const newIsRunning = !task.isTimerRunning;
+    const now = new Date().toISOString();
 
-    // UI Update
+    // UI Update immediately
     setTasks(prev => prev.map(t => {
       if (t.id === id) {
         return { ...t, isTimerRunning: newIsRunning };
@@ -192,6 +196,7 @@ const App: React.FC = () => {
 
     // DB Update
     try {
+      // If starting, we might want to record start time (simplified here)
       await taskService.updateTask(id, {
         isTimerRunning: newIsRunning,
         durationSeconds: task.durationSeconds
