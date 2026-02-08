@@ -21,12 +21,20 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         setError(null);
         try {
             if (isSignUp) {
-                const { session } = await authService.runSignUp(email, password, role);
-                if (session) {
+                // Sign up
+                await authService.runSignUp(email, password, role);
+
+                // Try to login immediately (Assuming auto-confirm is active via SQL Trigger)
+                try {
+                    await authService.runLogin(email, password);
                     onLoginSuccess();
-                } else {
-                    alert('تم إنشاء الحساب بنجاح!\n\n⚠️ تم إرسال رابط التفعيل إلى بريدك الإلكتروني.\nمن فضلك اضغط على الرابط في الايميل لتفعيل الحساب قبل تسجيل الدخول.\n(قد تجده في الـ Spam)');
-                    setIsSignUp(false);
+                } catch (loginErr: any) {
+                    // If login fails (maybe trigger didn't run fast enough?), warn user
+                    if (loginErr.message?.includes('Email not confirmed')) {
+                        alert('تم إنشاء الحساب! إذا لم يتم تسجيل الدخول تلقائياً، يرجى التحقق من تفعيل الحساب.');
+                    } else {
+                        throw loginErr;
+                    }
                 }
             } else {
                 await authService.runLogin(email, password);
@@ -37,8 +45,8 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             let msg = err.message || 'حدث خطأ ما';
 
             // Translate common errors
-            if (msg.includes('Invalid login credentials')) msg = 'خطأ في الايميل أو كلمة المرور (أو الحساب غير مفعل)';
-            if (msg.includes('Email not confirmed')) msg = 'لم يتم تفعيل الحساب! افحص الايميل واضغط على الرابط.';
+            if (msg.includes('Invalid login credentials')) msg = 'خطأ في الايميل أو كلمة المرور';
+            if (msg.includes('Email not confirmed')) msg = 'لم يتم تفعيل الحساب بعد.';
             if (msg.includes('User already registered')) msg = 'هذا البريد الإلكتروني مسجل بالفعل';
             if (msg.includes('Password should be at least')) msg = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
 
