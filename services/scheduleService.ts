@@ -26,22 +26,33 @@ export const scheduleService = {
 
     // Get marks for a date (for UI display - e.g. HR view)
     async getMarks(date: string) {
-        const { data, error } = await supabase
+        // 1. Get Marks
+        const { data: marks, error: marksError } = await supabase
             .from('calendar_marks')
-            .select(`
-        *,
-        profiles (email)
-      `)
+            .select('*')
             .eq('date', date);
 
-        if (error) throw error;
+        if (marksError) throw marksError;
+        if (!marks || marks.length === 0) return [];
 
-        return data.map((m: any) => ({
+        // 2. Get Profiles
+        const userIds = marks.map((m: any) => m.user_id);
+        const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, email')
+            .in('id', userIds);
+
+        if (profilesError) throw profilesError;
+
+        // 3. Map together
+        const profileMap = new Map(profiles?.map((p: any) => [p.id, p]));
+
+        return marks.map((m: any) => ({
             id: m.id,
             user_id: m.user_id,
             date: m.date,
             type: m.type,
-            userEmail: m.profiles?.email
+            userEmail: profileMap.get(m.user_id)?.email || 'Unknown'
         }));
     },
 
