@@ -8,6 +8,7 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     const [isSignUp, setIsSignUp] = useState(false);
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -21,8 +22,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         setError(null);
         try {
             if (isSignUp) {
+                if (!name.trim()) throw new Error('يرجى كتابة الاسم');
+
                 // Sign up
-                await authService.runSignUp(email, password, role);
+                await authService.runSignUp(email, password, name, role);
 
                 // Try to login immediately (Assuming auto-confirm is active via SQL Trigger)
                 try {
@@ -49,6 +52,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             if (msg.includes('Email not confirmed')) msg = 'لم يتم تفعيل الحساب بعد.';
             if (msg.includes('User already registered')) msg = 'هذا البريد الإلكتروني مسجل بالفعل';
             if (msg.includes('Password should be at least')) msg = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+            if (msg.includes('يرجى كتابة الاسم')) msg = 'يرجى كتابة الاسم';
 
             setError(msg);
         } finally {
@@ -73,6 +77,20 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    {isSignUp && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">الاسم</label>
+                            <input
+                                type="text"
+                                required
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-500 outline-none transition-all"
+                                placeholder="اسمك الثنائي"
+                            />
+                        </div>
+                    )}
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
                         <div className="relative">

@@ -138,7 +138,7 @@ const HRDashboard: React.FC<HRDashboardProps> = ({ onLogout }) => {
                             {collegeMarks.map((m, idx) => (
                                 <div key={idx} className="bg-white text-blue-700 px-4 py-2 rounded-xl text-sm font-bold border border-blue-200 shadow-sm flex items-center gap-2">
                                     <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                                    {m.userEmail || 'User'}
+                                    {m.userName || m.userEmail || 'User'}
                                 </div>
                             ))}
                         </div>

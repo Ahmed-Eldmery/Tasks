@@ -7,6 +7,7 @@ export interface Task {
   date: string; // YYYY-MM-DD format
   userId?: string;
   userEmail?: string;
+  userName?: string;
 }
 
 export interface ScheduleMark {
@@ -15,6 +16,8 @@ export interface ScheduleMark {
   date: string; // YYYY-MM-DD
   type: string; // 'college'
   created_at?: string;
+  userEmail?: string;
+  userName?: string;
 }
 
 export interface AppSettings {

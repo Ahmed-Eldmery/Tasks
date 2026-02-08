@@ -39,7 +39,7 @@ export const scheduleService = {
         const userIds = marks.map((m: any) => m.user_id);
         const { data: profiles, error: profilesError } = await supabase
             .from('profiles')
-            .select('id, email')
+            .select('id, email, name')
             .in('id', userIds);
 
         if (profilesError) throw profilesError;
@@ -47,13 +47,17 @@ export const scheduleService = {
         // 3. Map together
         const profileMap = new Map(profiles?.map((p: any) => [p.id, p]));
 
-        return marks.map((m: any) => ({
-            id: m.id,
-            user_id: m.user_id,
-            date: m.date,
-            type: m.type,
-            userEmail: profileMap.get(m.user_id)?.email || 'Unknown'
-        }));
+        return marks.map((m: any) => {
+            const profile = profileMap.get(m.user_id);
+            return {
+                id: m.id,
+                user_id: m.user_id,
+                date: m.date,
+                type: m.type,
+                userEmail: profile?.email || 'Unknown',
+                userName: profile?.name || profile?.email?.split('@')[0] || 'Unknown'
+            };
+        });
     },
 
     // Get mark for current user on a specific date (for Team Member)

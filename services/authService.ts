@@ -3,6 +3,7 @@ import { supabase } from './supabaseClient';
 export interface UserProfile {
     id: string;
     email: string;
+    name?: string;
     role: 'member' | 'hr';
 }
 
@@ -16,7 +17,7 @@ export const authService = {
         return data;
     },
 
-    async runSignUp(email: string, password: string, role: 'member' | 'hr' = 'member') {
+    async runSignUp(email: string, password: string, name: string, role: 'member' | 'hr' = 'member') {
         // Sign up with Supabase Auth
         const { data, error } = await supabase.auth.signUp({
             email,
@@ -32,6 +33,7 @@ export const authService = {
                 .upsert({
                     id: data.user.id,
                     email: email,
+                    name: name,
                     role: role
                 }, { onConflict: 'id' });
 
