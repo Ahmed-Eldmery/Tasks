@@ -210,7 +210,9 @@ const HRDashboard: React.FC<HRDashboardProps> = ({ onLogout }) => {
                                 رابط صورة الجدول
                             </label>
                             <p className="text-xs text-gray-500 mb-2">
-                                قم برفع الصورة على موقع رفع صور وانسخ الرابط هنا.
+                                1. ارفع الصورة على موقع <a href="https://imgbb.com/" target="_blank" className="text-blue-500 underline">ImgBB</a><br />
+                                2. انسخ "الرابط المباشر" (Direct Link) وضعه هنا.<br />
+                                (يجب أن ينتهي الرابط بـ .jpg أو .png)
                             </p>
                             <input
                                 type="url"

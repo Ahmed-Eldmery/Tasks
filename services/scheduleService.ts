@@ -10,8 +10,8 @@ export const scheduleService = {
             .eq('key', 'schedule_url')
             .single();
 
-        if (error) return null;
-        return data?.value || null;
+        if (error) return '/schedule.jpeg'; // Return local default if error
+        return data?.value || '/schedule.jpeg'; // Return local default if null
     },
 
     // Set Schedule Image URL (HR Only)

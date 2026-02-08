@@ -11,7 +11,8 @@ import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 import { scheduleService } from './services/scheduleService';
 import { ScheduleMark } from './types';
-import { X, Image as ImageIcon, GraduationCap } from 'lucide-react';
+import { X, Image as ImageIcon, GraduationCap, Check } from 'lucide-react';
+
 
 const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -338,22 +339,22 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        {/* College Mark Toggle */}
-        <div className="mb-6 flex justify-center">
-          <button
-            onClick={toggleCollegeMark}
-            disabled={markingSchedule}
-            className={`
-                    w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-bold transition-all shadow-sm
-                    ${isCollegeDay
-                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200'
-                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-              }
-                `}
-          >
-            <GraduationCap className={`w-5 h-5 ${isCollegeDay ? 'text-white' : 'text-gray-400'}`} />
-            {markingSchedule ? 'جاري التحديث...' : isCollegeDay ? 'أنا في الكلية اليوم' : 'تحديد كـ يوم كلية'}
-          </button>
+        {/* College Mark Checkbox */}
+        <div className="mb-6 bg-white p-4 rounded-2xl shadow-sm border border-orange-100 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition-colors" onClick={toggleCollegeMark}>
+          <div className="flex items-center gap-3">
+            <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${isCollegeDay ? 'bg-blue-600 border-blue-600' : 'border-gray-300 bg-white'}`}>
+              {isCollegeDay && <Check className="w-4 h-4 text-white" />}
+            </div>
+            <div className="flex flex-col">
+              <span className={`font-bold text-lg ${isCollegeDay ? 'text-blue-900' : 'text-gray-700'}`}>
+                عندي كلية في اليوم ده
+              </span>
+              <span className="text-xs text-gray-500">
+                علم هنا لو انت هتروح الكلية في تاريخ {selectedDate}
+              </span>
+            </div>
+          </div>
+          <GraduationCap className={`w-8 h-8 ${isCollegeDay ? 'text-blue-600' : 'text-gray-300'}`} />
         </div>
 
         {/* Input Area */}
